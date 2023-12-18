@@ -15,7 +15,7 @@ contract Crowdsale is ReentrancyGuard, Ownable {
     uint256 public constant MIN_LZC_AMOUNT = 5 * 1e18;
     uint256 public constant MAX_LZC_AMOUNT = 5000 * 1e18;
 
-    //адрес на который поступают средства юзеров
+    //the address to which user funds are received
     address public immutable recepient;
 
     ERC20 public immutable token;
@@ -25,7 +25,7 @@ contract Crowdsale is ReentrancyGuard, Ownable {
 
     AggregatorV3Interface public priceOracleBNBUSDT;
 
-    //текущая цена
+    //current price of token
     uint256 public currentPriceInUsd;
 
     enum Asset {
@@ -35,7 +35,7 @@ contract Crowdsale is ReentrancyGuard, Ownable {
         BNB
     }
 
-    //баланс кто сколько токенов может заклеймить
+    //balance of LZC for claim
     mapping(address => uint256) public balances;
 
     uint256 public soldCount;
@@ -62,10 +62,10 @@ contract Crowdsale is ReentrancyGuard, Ownable {
         recepient = _recepient;
     }
 
-    //инициализируем краудсейл. забираем у мсг сендера токены и устанавливаем значение хард кап
+    ///crowdsale initialization
     function init(uint256 tokensCount, uint256 priceInUsd) external onlyOwner {
         //не забыть дать алованс краудсейлу
-        token.safeTransferFrom(msg.sender, address(this), tokensCount);
+        //token.safeTransferFrom(msg.sender, address(this), tokensCount);
         currentPriceInUsd = priceInUsd;
         amountToSale = tokensCount;
         emit IcoStarted();
@@ -112,8 +112,8 @@ contract Crowdsale is ReentrancyGuard, Ownable {
     }
 
     /// @notice Buy token for USDT
-    /// @param value сколько ассета передадим для покупки
-    /// @param asset валюта за которую покупается токен
+    /// @param value assets amount
+    /// @param asset asset to buy token
     function buy(uint256 value, Asset asset) external payable nonReentrant {
         uint256 lzcAmount = getLzcAmount(
             asset == Asset.BNB ? msg.value : value,
@@ -124,7 +124,7 @@ contract Crowdsale is ReentrancyGuard, Ownable {
         require(lzcAmount <= MAX_LZC_AMOUNT, "MAX 5000 LZC");
         require(!isFinished, "ICO Finished");
 
-        // Расчет потраченной суммы в BNB или USD
+        // calculation of spended amount
         uint256 spentAmount;
         if (asset == Asset.BNB) {
             spentAmount = (lzcAmount * getLzcPriceInBnb()) / (10 ** 18);
@@ -132,7 +132,6 @@ contract Crowdsale is ReentrancyGuard, Ownable {
             if (refund > 0) {
                 payable(msg.sender).transfer(refund);
             }
-            //переводим деньги с контракта на рецепиента
             payable(recepient).transfer(msg.value - refund);
         } else {
             getUsd(asset).safeTransferFrom(msg.sender, address(this), value);
@@ -141,14 +140,13 @@ contract Crowdsale is ReentrancyGuard, Ownable {
             if (refund > 0) {
                 getUsd(asset).transfer(msg.sender, refund);
             }
-            //переводим деньги с контракта на рецепиента
             getUsd(asset).transfer(recepient, value - refund);
         }
 
         balances[msg.sender] += lzcAmount;
         soldCount += lzcAmount;
 
-        //проверим если на контракте осталось меньше минимума, то завершаем краудсейл отправляя все токены рецепиенту
+        //we check if there is less than the minimum left on the contract, then we complete the crowdsale by sending all tokens to the recipient
         if (amountToSale - soldCount < MIN_LZC_AMOUNT) {
             isFinished = true;
             token.transfer(recepient, amountToSale - soldCount);
@@ -157,7 +155,7 @@ contract Crowdsale is ReentrancyGuard, Ownable {
         }
     }
 
-    //если краудсейл окончен, то выводит токены юзера ему на кошелёк
+    //if the crowdsale is over, it withdraws the user’s tokens to his wallet
     function claim() external {
         require(isFinished, "ICO is not finished");
         uint256 balance = balances[msg.sender];
