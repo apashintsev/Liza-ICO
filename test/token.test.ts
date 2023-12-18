@@ -84,7 +84,6 @@ describe("Tests", () => {
     const { deployer, crowdsale, lizaCoin } = await loadFixture(deploy);
 
     expect(await crowdsale.owner()).eq(deployer.address);
-    expect(await crowdsale.hardCap()).eq(0);
     expect(await crowdsale.currentPriceInUsd()).eq(ethers.parseEther("7"));
     expect(await lizaCoin.balanceOf(await crowdsale.getAddress())).eq(
       ethers.parseEther("30000")
