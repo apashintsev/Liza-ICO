@@ -64,43 +64,40 @@ contract Crowdsale is ReentrancyGuard, Ownable {
 
     ///crowdsale initialization
     function init(uint256 tokensCount, uint256 priceInUsd) external onlyOwner {
-        //не забыть дать алованс краудсейлу
-        //token.safeTransferFrom(msg.sender, address(this), tokensCount);
         currentPriceInUsd = priceInUsd;
         amountToSale = tokensCount;
         emit IcoStarted();
     }
 
-    //вернёт цену токена в БНБ
+    //returns token price in BNB
     function getLzcPriceInBnb() public view returns (uint256) {
-        (, int256 bnbPriceInUsd, , , ) = priceOracleBNBUSDT.latestRoundData(); // Цена BNB в USD от оракула
+        (, int256 bnbPriceInUsd, , , ) = priceOracleBNBUSDT.latestRoundData(); // Price in BNB from Oracle
         uint256 bnbPrice = uint256(bnbPriceInUsd);
-        uint256 decimals = 8; // Количество десятичных знаков в цене BNB
+        uint256 decimals = 8; // Decimals in BNB price
 
-        // Расчет цены одного токена LZC в BNB
-        uint256 lzcPriceInUsd = currentPriceInUsd; // Текущая цена одного токена LZC в USD
+        //calc LZC in BNB price
+        uint256 lzcPriceInUsd = currentPriceInUsd; // current price of one LZC in USD
         uint256 lzcPriceInBnb = (lzcPriceInUsd * (10 ** decimals)) / bnbPrice;
 
         return lzcPriceInBnb;
     }
 
-    //вернёт сколько положено лзц за сумму в указанной валюте
+    //returns lzc count for asset amount
     function getLzcAmount(
         uint256 value,
         Asset asset
     ) public view returns (uint256) {
         if (asset == Asset.BNB) {
-            (, int256 answer, , , ) = priceOracleBNBUSDT.latestRoundData(); //цена BNB в USD
+            (, int256 answer, , , ) = priceOracleBNBUSDT.latestRoundData(); //BNB in USD price
             uint256 bnbPrice = uint256(answer);
-            uint256 decimals = 8; // Количество десятичных знаков в цене BNB
-            // Конвертируем BNB в USD, учитывая десятичные знаки
+            uint256 decimals = 8; // Decimals in BNB price
             uint256 usdAmountInBnbValue = (value * bnbPrice) / (10 ** decimals);
             value = usdAmountInBnbValue;
         }
         return (value / currentPriceInUsd) * 10 ** token.decimals();
     }
 
-    //получает токен
+    //пget token
     function getUsd(Asset asset) private view returns (ERC20) {
         if (asset == Asset.USDT) {
             return usdt;
