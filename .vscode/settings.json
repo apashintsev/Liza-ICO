@@ -1,5 +1,10 @@
 {
   "solidity.compileUsingLocalVersion": "c:\\Source\\Repos\\Smartcontracts\\Liza ICO\\soljson-v0.8.19+commit.7dd6d404.js",
   "solidity.compileUsingRemoteVersion": "v0.8.19+commit.7dd6d404",
-  "solidity.defaultCompiler": "remote"
+  "solidity.defaultCompiler": "remote",
+  "[tact]": {
+    "editor.formatOnSave": true
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

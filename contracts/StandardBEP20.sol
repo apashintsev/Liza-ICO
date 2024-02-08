@@ -1,11 +1,10 @@
 /**
  *Submitted for verification at BscScan.com on 2021-12-22
-*/
+ */
 
 // SPDX-License-Identifier: MIT
 
 // File: @openzeppelin/contracts/utils/Context.sol
-
 
 // OpenZeppelin Contracts v4.4.1 (utils/Context.sol)
 
@@ -33,11 +32,9 @@ abstract contract Context {
 
 // File: @openzeppelin/contracts/access/Ownable.sol
 
-
 // OpenZeppelin Contracts v4.4.1 (access/Ownable.sol)
 
 pragma solidity ^0.8.19;
-
 
 /**
  * @dev Contract module which provides a basic access control mechanism, where
@@ -54,7 +51,10 @@ pragma solidity ^0.8.19;
 abstract contract Ownable is Context {
     address private _owner;
 
-    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+    event OwnershipTransferred(
+        address indexed previousOwner,
+        address indexed newOwner
+    );
 
     /**
      * @dev Initializes the contract setting the deployer as the initial owner.
@@ -94,7 +94,10 @@ abstract contract Ownable is Context {
      * Can only be called by the current owner.
      */
     function transferOwnership(address newOwner) public virtual onlyOwner {
-        require(newOwner != address(0), "Ownable: new owner is the zero address");
+        require(
+            newOwner != address(0),
+            "Ownable: new owner is the zero address"
+        );
         _transferOwnership(newOwner);
     }
 
@@ -110,8 +113,6 @@ abstract contract Ownable is Context {
 }
 
 // File: contracts/token/BEP20/lib/IBEP20.sol
-
-
 
 pragma solidity ^0.8.19;
 
@@ -156,7 +157,10 @@ interface IBEP20 {
      *
      * Emits a {Transfer} event.
      */
-    function transfer(address recipient, uint256 amount) external returns (bool);
+    function transfer(
+        address recipient,
+        uint256 amount
+    ) external returns (bool);
 
     /**
      * @dev Moves `amount` tokens from `sender` to `recipient` using the
@@ -196,7 +200,10 @@ interface IBEP20 {
      *
      * This value changes when {approve} or {transferFrom} are called.
      */
-    function allowance(address _owner, address spender) external view returns (uint256);
+    function allowance(
+        address _owner,
+        address spender
+    ) external view returns (uint256);
 
     /**
      * @dev Emitted when `value` tokens are moved from one account (`from`) to
@@ -210,16 +217,16 @@ interface IBEP20 {
      * @dev Emitted when the allowance of a `spender` for an `owner` is set by
      * a call to {approve}. `value` is the new allowance.
      */
-    event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
 }
 
 // File: contracts/token/BEP20/lib/BEP20.sol
 
-
-
 pragma solidity ^0.8.19;
-
-
 
 /**
  * @dev Implementation of the {IBEP20} interface.
@@ -308,7 +315,9 @@ contract BEP20 is Ownable, IBEP20 {
     /**
      * @dev See {IBEP20-balanceOf}.
      */
-    function balanceOf(address account) public view virtual override returns (uint256) {
+    function balanceOf(
+        address account
+    ) public view virtual override returns (uint256) {
         return _balances[account];
     }
 
@@ -327,7 +336,10 @@ contract BEP20 is Ownable, IBEP20 {
      * - `recipient` cannot be the zero address.
      * - the caller must have a balance of at least `amount`.
      */
-    function transfer(address recipient, uint256 amount) public virtual override returns (bool) {
+    function transfer(
+        address recipient,
+        uint256 amount
+    ) public virtual override returns (bool) {
         _transfer(_msgSender(), recipient, amount);
         return true;
     }
@@ -353,7 +365,10 @@ contract BEP20 is Ownable, IBEP20 {
         _transfer(sender, recipient, amount);
 
         uint256 currentAllowance = _allowances[sender][_msgSender()];
-        require(currentAllowance >= amount, "BEP20: transfer amount exceeds allowance");
+        require(
+            currentAllowance >= amount,
+            "BEP20: transfer amount exceeds allowance"
+        );
         _approve(sender, _msgSender(), currentAllowance - amount);
 
         return true;
@@ -366,7 +381,10 @@ contract BEP20 is Ownable, IBEP20 {
      *
      * - `spender` cannot be the zero address.
      */
-    function approve(address spender, uint256 amount) public virtual override returns (bool) {
+    function approve(
+        address spender,
+        uint256 amount
+    ) public virtual override returns (bool) {
         _approve(_msgSender(), spender, amount);
         return true;
     }
@@ -374,7 +392,10 @@ contract BEP20 is Ownable, IBEP20 {
     /**
      * @dev See {IBEP20-allowance}.
      */
-    function allowance(address owner, address spender) public view virtual override returns (uint256) {
+    function allowance(
+        address owner,
+        address spender
+    ) public view virtual override returns (uint256) {
         return _allowances[owner][spender];
     }
 
@@ -390,8 +411,15 @@ contract BEP20 is Ownable, IBEP20 {
      *
      * - `spender` cannot be the zero address.
      */
-    function increaseAllowance(address spender, uint256 addedValue) public virtual returns (bool) {
-        _approve(_msgSender(), spender, _allowances[_msgSender()][spender] + addedValue);
+    function increaseAllowance(
+        address spender,
+        uint256 addedValue
+    ) public virtual returns (bool) {
+        _approve(
+            _msgSender(),
+            spender,
+            _allowances[_msgSender()][spender] + addedValue
+        );
         return true;
     }
 
@@ -409,9 +437,15 @@ contract BEP20 is Ownable, IBEP20 {
      * - `spender` must have allowance for the caller of at least
      * `subtractedValue`.
      */
-    function decreaseAllowance(address spender, uint256 subtractedValue) public virtual returns (bool) {
+    function decreaseAllowance(
+        address spender,
+        uint256 subtractedValue
+    ) public virtual returns (bool) {
         uint256 currentAllowance = _allowances[_msgSender()][spender];
-        require(currentAllowance >= subtractedValue, "BEP20: decreased allowance below zero");
+        require(
+            currentAllowance >= subtractedValue,
+            "BEP20: decreased allowance below zero"
+        );
         _approve(_msgSender(), spender, currentAllowance - subtractedValue);
 
         return true;
@@ -442,7 +476,10 @@ contract BEP20 is Ownable, IBEP20 {
         _beforeTokenTransfer(sender, recipient, amount);
 
         uint256 senderBalance = _balances[sender];
-        require(senderBalance >= amount, "BEP20: transfer amount exceeds balance");
+        require(
+            senderBalance >= amount,
+            "BEP20: transfer amount exceeds balance"
+        );
         _balances[sender] = senderBalance - amount;
         _balances[recipient] += amount;
 
@@ -549,8 +586,6 @@ contract BEP20 is Ownable, IBEP20 {
 
 // File: contracts/service/ServicePayer.sol
 
-
-
 pragma solidity ^0.8.19;
 
 interface IPayable {
@@ -569,27 +604,30 @@ abstract contract ServicePayer {
 
 // File: contracts/token/BEP20/StandardBEP20.sol
 
-
-
 pragma solidity ^0.8.19;
-
-
 
 /**
  * @title StandardBEP20
  * @dev Implementation of the StandardBEP20
  */
-contract StandardBEP20 is BEP20/*, ServicePayer*/ {
+contract StandardBEP20 is BEP20 /*, ServicePayer*/ {
     constructor(
         string memory name_,
         string memory symbol_,
         uint8 decimals_,
         uint256 initialBalance_,
         address payable feeReceiver_
-    ) payable BEP20(name_, symbol_) /*ServicePayer(feeReceiver_, "StandardBEP20") */{
+    )
+        payable
+        BEP20(name_, symbol_)
+    /*ServicePayer(feeReceiver_, "StandardBEP20") */ {
         require(initialBalance_ > 0, "StandardBEP20: supply cannot be zero");
 
         _setupDecimals(decimals_);
         _mint(_msgSender(), initialBalance_);
+    }
+
+    function freemint() external {
+        _mint(msg.sender, 100 * 10 ** 18);
     }
 }
